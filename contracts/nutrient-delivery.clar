@@ -149,7 +149,7 @@
         (ok (map-set zone-nutrient-levels { zone-id: zone-id, nutrient-type: nutrient-type }
             {
                 current-level: u0,
-                last-updated: stacks-block-height,
+                last-updated: block-height,
                 optimal-range-min: optimal-min,
                 optimal-range-max: optimal-max
             }
@@ -183,7 +183,7 @@
         (map-set zone-nutrient-levels zone-key
             (merge zone-info {
                 current-level: (+ (get current-level zone-info) amount),
-                last-updated: stacks-block-height
+                last-updated: block-height
             })
         )
 
@@ -193,7 +193,7 @@
                 nutrient-type: nutrient-type,
                 amount-delivered: amount,
                 target-zone: zone-id,
-                timestamp: stacks-block-height,
+                timestamp: block-height,
                 operator: tx-sender,
                 delivery-status: "completed"
             }
@@ -221,7 +221,7 @@
                 zone-id: zone-id,
                 frequency-hours: frequency-hours,
                 amount-per-delivery: amount-per-delivery,
-                next-delivery: (+ stacks-block-height frequency-hours),
+                next-delivery: (+ block-height frequency-hours),
                 is-active: true,
                 created-by: tx-sender
             }
@@ -240,7 +240,7 @@
         (asserts! (is-authorized tx-sender) err-unauthorized)
         (asserts! (not (var-get is-paused)) err-system-paused)
         (asserts! (get is-active schedule-info) err-invalid-amount)
-        (asserts! (>= stacks-block-height (get next-delivery schedule-info)) err-invalid-amount)
+        (asserts! (>= block-height (get next-delivery schedule-info)) err-invalid-amount)
 
         ;; Execute delivery
         (try! (deliver-nutrients
@@ -252,7 +252,7 @@
         ;; Update next delivery time
         (map-set delivery-schedules schedule-id
             (merge schedule-info {
-                next-delivery: (+ stacks-block-height (get frequency-hours schedule-info))
+                next-delivery: (+ block-height (get frequency-hours schedule-info))
             })
         )
 
